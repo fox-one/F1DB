@@ -1,0 +1,16 @@
+general:
+  quota_id: "YOUR QUOTA ID"
+  collector_user_id: "YOUR COLLECTOR USER ID"
+  pin: "123456"
+  default_quota: "0.001"
+server:
+  host: 127.0.0.1:4321
+ipfs:
+  url: localhost:5001
+broker:
+  app_id: "YOUR FOX.ONE APP ID"
+  app_secret: "YOUR FOX.ONE APP SECRET"
+  dev_mode: true
+users:
+  - id: u225567
+    key: KmNfu7qmXQyziKScy2RKy3SYptJNc5JxMYQLiwJyCMpDyW
