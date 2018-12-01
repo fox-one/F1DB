@@ -13,7 +13,7 @@ A distributed database interface based on Mixin Network and IPFS.
 - [ ] Cache
 - [ ] Index interface
 
-## Demo
+## Projects using F1DB 
 
 - Whisper.news: https://github.com/fox.one/whisper-news
 - Love seal: https://github.com/fox.one/love-seal
