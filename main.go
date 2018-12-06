@@ -17,8 +17,8 @@ func main() {
 	ctx := context.Background()
 
 	config.Init()
+	account.InitSession()
 	account.SetupBroker(config.GetConfig().Broker)
-	account.InitUserDb(ctx)
 	pk, err := account.GetFoxPublicKey(ctx)
 	if err != nil {
 		log.Panic(err)
@@ -30,8 +30,8 @@ func main() {
 		storage.InitIpfs()
 		serve(ctx, pk)
 	} else if *mode == "register" {
-		if newUser, err := account.Register(ctx, pk); err == nil {
-			log.Printf("New User:\n- ID: %s\n- Key: %s\n", newUser.ID, newUser.Key)
+		if newUserID, err := account.Register(ctx, pk); err == nil {
+			log.Printf("New User:\n- ID: %s\n", newUserID)
 		} else {
 			log.Panic(err)
 		}

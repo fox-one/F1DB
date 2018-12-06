@@ -2,58 +2,95 @@ package account
 
 import (
 	"context"
+	"log"
 
+	fxBroker "github.com/fox-one/broker"
+	"github.com/fox-one/f1db/config"
 	util "github.com/fox-one/f1db/util"
+	fxWallet "github.com/fox-one/foxgo/wallet"
 	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
 )
 
 type Session struct {
-	UserID string
-	Key    string
-	Token  string
+	UserID  string
+	Token   string
+	MixinID string
 }
 
 var userSessions map[string]*Session
 
-func Login(ctx context.Context, userID string, userKey string) (*User, error) {
-	user := AuthUser(userID, userKey)
+func InitSession() {
+	userSessions = make(map[string]*Session)
+}
+
+func Login(ctx context.Context, userID string) (string, error) {
 	if userSessions == nil {
 		userSessions = make(map[string]*Session)
 	}
-	if user != nil {
-		resp, err := GetBroker().Login(ctx, user.ID)
+	if len(userID) != 0 {
+		resp, err := GetBroker().Login(ctx, userID)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 		ses := new(Session)
 		ses.UserID = userID
 		ses.Token = resp.Token
-		ses.Key = userKey
+		if stat, err := fxWallet.GetWalletStatus(ctx, ses.Token); err == nil {
+			ses.MixinID = stat.MixinId
+		} else {
+			log.Printf("get wallet stat for user %d failed: %s\n", userID, err.Error())
+		}
+		log.Printf("User Login:\n- userID: %s\n- MixinID: %s\n", ses.UserID, ses.MixinID)
 		userSessions[userID] = ses
 	}
-	return user, nil
+	return userID, nil
+}
+
+func Register(ctx context.Context, pk string) (string, error) {
+	var uid uuid.UUID
+	var err error
+	var resp *fxBroker.UserResponse
+	uid, err = uuid.NewV4()
+	if err != nil {
+		return "", err
+	}
+	uidStr := uid.String()
+	resp, err = GetBroker().Register(ctx, uidStr, uidStr, "")
+	if err != nil {
+		return "", err
+	}
+
+	pin := config.GetConfig().General.Pin
+	if err := UpdatePin(ctx, resp.Token, EmptyPin, NewPin(pin, pk)); err != nil {
+		return "", err
+	}
+	ses := new(Session)
+	ses.UserID = resp.User.Id
+	ses.Token = resp.Token
+	if stat, err := fxWallet.GetWalletStatus(ctx, ses.Token); err == nil {
+		ses.MixinID = stat.MixinId
+	} else {
+		log.Printf("get wallet stat for user %d failed: %s\n", ses.UserID, err.Error())
+	}
+	userSessions[ses.UserID] = ses
+	return ses.UserID, nil
 }
 
 func AuthRequired() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		if len(ctx.Request.Header.Get("-x-user-id")) == 0 || len(ctx.Request.Header.Get("-x-user-key")) == 0 {
+		userID := ctx.Request.Header.Get("-x-user-id")
+		if len(userID) == 0 {
 			util.RespError(ctx, 403, 2, "Invalid auth info")
 			ctx.Abort()
 			return
 		}
-		userID := ctx.Request.Header.Get("-x-user-id")
-		userKey := ctx.Request.Header.Get("-x-user-key")
-		if user := AuthUser(userID, userKey); user != nil {
-			_, err := Login(ctx, userID, userKey)
-			if err != nil {
-				util.RespError(ctx, 403, 2, "Failed to login the DAG Network gateway")
-				ctx.Abort()
-			} else {
-				ctx.Next()
-			}
-		} else {
-			util.RespError(ctx, 403, 2, "Incorrect user ID or key")
+		_, err := Login(ctx, userID)
+		if err != nil {
+			util.RespError(ctx, 403, 2, "Failed to login the DAG Network gateway")
 			ctx.Abort()
+		} else {
+			ctx.Next()
 		}
 	}
 }

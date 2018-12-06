@@ -33,10 +33,7 @@ func NewRecordHandler(ctx *gin.Context) {
 	req := NewRecordRequest{}
 	ctx.ShouldBindJSON(&req)
 	ses := account.CurrentSession(ctx)
-	user := account.User{
-		ID:  ses.UserID,
-		Key: ses.Key,
-	}
+	userID := ses.UserID
 	if req.Brief == "" {
 		if len(req.Content) > 32 {
 			req.Brief = req.Content[:32]
@@ -44,7 +41,7 @@ func NewRecordHandler(ctx *gin.Context) {
 			req.Brief = req.Content
 		}
 	}
-	item, err := storage.WriteItem(&user, req.ItemType, req.Brief, req.Content)
+	item, err := storage.WriteItem(userID, req.ItemType, req.Brief, req.Content)
 	if err != nil {
 		util.RespError(ctx, 500, 1, fmt.Sprintf("Failed to write item. %s", err))
 		return

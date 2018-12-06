@@ -19,11 +19,12 @@ func serve(ctx context.Context, pk string) {
 			"message": "Hello.",
 		})
 	})
-	router.POST("/login", ctrl.LoginHandler)
+	router.POST("/register", ctrl.RegisterHandler(ctx, pk))
+	router.POST("/login", ctrl.LoginHandler(ctx))
 	router.POST("/records", account.AuthRequired(), ctrl.NewRecordHandler)
-	router.GET("/records/:hash", account.AuthRequired(), ctrl.GetRecordHandler)
+	router.GET("/records/:hash", ctrl.GetRecordHandler)
 	router.POST("/records/:hash/keep", account.AuthRequired(), ctrl.KeepRecordHandler(pk))
-	router.GET("/snapshots/:snapshot_id", account.AuthRequired(), ctrl.GetSnapshotHandler(ctx))
+	router.GET("/snapshots/:snapshot_id", ctrl.GetSnapshotHandler(ctx))
 	log.Printf("Server starts on %s\n", config.GetConfig().Server.Host)
 	router.Run(config.GetConfig().Server.Host)
 }

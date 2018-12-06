@@ -14,15 +14,6 @@ type Config struct {
 	Server  ServerCfg
 	Ipfs    IpfsCfg
 	Broker  BrokerCfg
-	Users   []UserCfg `yaml:"users" json:"users"`
-}
-
-/*
-UserCfg is used in user system.
-*/
-type UserCfg struct {
-	ID  string `yaml:"id" json:"id"`
-	Key string `yaml:"key" json:"key"`
 }
 
 /*

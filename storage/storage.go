@@ -18,7 +18,7 @@ const ContentTypePlainText = "text/plain"
 const ContentTypeImagePng = "image/png"
 
 type ItemMeta struct {
-	Creator     account.User
+	CreatorID   string
 	Version     uint
 	Type        string
 	SnapshotID  string
@@ -36,17 +36,17 @@ type ItemHead struct {
 	B string
 }
 
-func WriteItem(user *account.User, itemType string, brief string, content string) (*Item, error) {
+func WriteItem(userID string, itemType string, brief string, content string) (*Item, error) {
 	var err error
 	var packed []byte
 	var cid string
 	meta := ItemMeta{
-		Creator: *user,
-		Version: 1,
-		Type:    itemType,
-		Brief:   brief,
-		QuotaID: config.GetConfig().General.QuotaID,
-		CID:     "",
+		CreatorID: userID,
+		Version:   1,
+		Type:      itemType,
+		Brief:     brief,
+		QuotaID:   config.GetConfig().General.QuotaID,
+		CID:       "",
 	}
 	item := Item{
 		ItemMeta: meta,
@@ -56,7 +56,7 @@ func WriteItem(user *account.User, itemType string, brief string, content string
 	if packed, err = msgpack.Marshal(&item); err != nil {
 		return nil, err
 	}
-	if cid, err = WriteToIpfs(packed, false); err != nil {
+	if cid, err = WriteToIpfs(packed, true); err != nil {
 		return nil, err
 	}
 	item.CID = cid
@@ -97,7 +97,7 @@ func ReadItem(ctx context.Context, cid string) (*Item, error) {
 	item.QuotaAmount = snapshot.Amount
 	item.Content = contentItem.Content
 	item.Type = contentItem.Type
-	item.Creator.ID = contentItem.Creator.ID
+	item.CreatorID = contentItem.CreatorID
 	item.Version = contentItem.Version
 	return &item, err
 }
@@ -153,7 +153,7 @@ func ReadRecord(cid string) (*Item, error) {
 
 func (item *Item) Response() interface{} {
 	return map[string]interface{}{
-		"user_id":      item.Creator.ID,
+		"user_id":      item.CreatorID,
 		"version":      item.Version,
 		"type":         item.Type,
 		"snapshot_id":  item.SnapshotID,
