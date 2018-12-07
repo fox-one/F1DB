@@ -9,14 +9,14 @@ A distributed database interface based on Mixin Network and IPFS.
 - [x] RESTful API supports
 - [x] User register and authorization
 - [ ] More storage implements
-- [ ] Better API authentication
+- [x] Better API authentication
 - [ ] Cache
 - [ ] Index interface
 
 ## Projects using F1DB 
 
 - Whisper.news: https://github.com/fox.one/whisper-news
-- Love seal: https://github.com/fox.one/love-seal
+- Love seal: https://github.com/lyricat/love-seal
 
 ## Usage
 
