@@ -73,7 +73,7 @@ func KeepRecordHandler(pk string) gin.HandlerFunc {
 		var item *storage.Item
 		hash := ctx.Param("hash")
 		req := KeepRecordRequest{}
-		quota := config.GetConfig().General.DefaultQuota
+		quota := config.GetConfig().General.QuotaAmount
 		ctx.ShouldBindJSON(&req)
 
 		if hash == "" {

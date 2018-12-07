@@ -5,7 +5,7 @@ import (
 	"log"
 
 	fxBroker "github.com/fox-one/broker"
-	"github.com/fox-one/f1db/config"
+	config "github.com/fox-one/f1db/config"
 	util "github.com/fox-one/f1db/util"
 	fxWallet "github.com/fox-one/foxgo/wallet"
 	"github.com/gin-gonic/gin"
@@ -16,6 +16,13 @@ type Session struct {
 	UserID  string
 	Token   string
 	MixinID string
+}
+
+type Quota struct {
+	QuotaID     string  `json:"quota_id"`
+	QuotaAmount string  `json:"quota_amount"`
+	PublicKey   string  `json:"public_key"`
+	Balance     float64 `json:"balance"`
 }
 
 var userSessions map[string]*Session
@@ -75,6 +82,34 @@ func Register(ctx context.Context, pk string) (string, error) {
 	}
 	userSessions[ses.UserID] = ses
 	return ses.UserID, nil
+}
+
+func GetQuota(ctx context.Context, token string) (*Quota, error) {
+	var assets fxWallet.Assets
+	var detail *fxWallet.Asset
+	var err error
+	assets, err = fxWallet.GetAssets(ctx, token, true)
+	if err != nil {
+		return nil, err
+	}
+	ret := &Quota{
+		QuotaID:     config.GetConfig().General.QuotaID,
+		Balance:     0,
+		PublicKey:   "",
+		QuotaAmount: config.GetConfig().General.QuotaAmount,
+	}
+	for _, asset := range assets {
+		if asset.AssetId == config.GetConfig().General.QuotaID {
+			ret.Balance = asset.Balance
+			break
+		}
+	}
+	detail, err = fxWallet.GetAssetDetail(ctx, token, config.GetConfig().General.QuotaID)
+	if err != nil {
+		return nil, err
+	}
+	ret.PublicKey = detail.PublicKey
+	return ret, nil
 }
 
 func AuthRequired() gin.HandlerFunc {

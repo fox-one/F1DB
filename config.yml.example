@@ -2,7 +2,7 @@ general:
   quota_id: "YOUR QUOTA ID"
   collector_user_id: "YOUR COLLECTOR USER ID"
   pin: "123456"
-  default_quota: "0.001"
+  quota_amount: "0.001"
 server:
   host: 127.0.0.1:4321
 ipfs:

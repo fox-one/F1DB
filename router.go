@@ -21,6 +21,7 @@ func serve(ctx context.Context, pk string) {
 	})
 	router.POST("/register", ctrl.RegisterHandler(ctx, pk))
 	router.POST("/login", ctrl.LoginHandler(ctx))
+	router.GET("/quota", account.AuthRequired(), ctrl.QuotaHandler(ctx))
 	router.POST("/records", account.AuthRequired(), ctrl.NewRecordHandler)
 	router.GET("/records/:hash", ctrl.GetRecordHandler)
 	router.POST("/records/:hash/keep", account.AuthRequired(), ctrl.KeepRecordHandler(pk))

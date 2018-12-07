@@ -28,7 +28,7 @@ GeneralCfg is used in user system.
 */
 type GeneralCfg struct {
 	QuotaID         string `yaml:"quota_id"`
-	DefaultQuota    string `yaml:"default_quota"`
+	QuotaAmount     string `yaml:"quota_amount"`
 	CollectorUserID string `yaml:"collector_user_id"`
 	Pin             string `yaml:"pin"`
 }

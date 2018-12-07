@@ -48,3 +48,20 @@ func RegisterHandler(ctx context.Context, pk string) gin.HandlerFunc {
 		}
 	}
 }
+
+func QuotaHandler(ctx context.Context) gin.HandlerFunc {
+	return func(ginCtx *gin.Context) {
+		ses := account.CurrentSession(ginCtx)
+		quota, err := account.GetQuota(ctx, ses.Token)
+		if err == nil {
+			ginCtx.JSON(200, gin.H{
+				"code": "0",
+				"data": gin.H{
+					"quota": quota,
+				},
+			})
+		} else {
+			util.RespError(ginCtx, 403, 3, fmt.Sprintf("Get Quota Error: %s", err))
+		}
+	}
+}
