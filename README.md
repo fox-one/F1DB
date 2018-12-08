@@ -8,10 +8,16 @@ A distributed database interface based on Mixin Network and IPFS.
 - [x] Large content supports
 - [x] RESTful API supports
 - [x] User register and authorization
-- [ ] More storage implements
 - [x] Better API authentication
+- [x] JSON RPC service
+- [ ] More storage implements
 - [ ] Cache
+- [ ] Storage node communication
 - [ ] Index interface
+
+## Documents
+
+- JSON RPC Document: https://documenter.getpostman.com/view/140588/RzfiG8ZN#intro
 
 ## Projects using F1DB 
 
@@ -20,35 +26,30 @@ A distributed database interface based on Mixin Network and IPFS.
 
 ## Usage
 
-### Register an App at Open.Fox.ONE
+### 1 Register an App at Open.Fox.ONE
 
-Email open@fox.one for application. Inquire a key/secret pair and a quota. 
+Email `open@fox.one` for application. Inquire a key/secret pair and a quota. 
 
-### Setup and run an IPFS daemon
+### 2 Setup and run an IPFS daemon
 
 FYI: https://docs.ipfs.io/introduction/usage/
 
-### Modify config.yml
+### 3 Modify config.yml
 
 - Use config.yml.example as template.
 - collector_user_id: a user that use to collector quota.
 - generate a new `pin` and keep it safe.
 
-### Register App users
+### 4 Run as JSON RPC service or use in your code
 
-Run 
-
-```bash
-$ ./f1db -m register
-```
-
-copy the user info and write them into config.yml
-
-### Run http server
+**JSON RPC service**
 
 ```bash
 $ ./f1db
 ```
+**use F1DB in your code**
+
+check out the [source](https://github.com/fox-one/F1DB/tree/master/controller).
 
 ## License
 
